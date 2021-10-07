@@ -9,6 +9,7 @@ Sake::DB - 来年も飲みたい日本酒データベース
     my $db_file = 'sake.db';
     Sake::DB::init( $db_file );
 
+    my $dbh = DBI->connect("dbi:SQLite:dbname=${db_file}");
     $inserted_brewery_id = Sake::Brewery::insert( $dbh, {
         name => '...',
         kana => '...',
@@ -36,6 +37,8 @@ Sake::DB - 来年も飲みたい日本酒データベース
         product_id => ..., # integer
         tag_id => ... # integer
     } );
+
+    $dbh->disconnect;
 # DESCRIPTION
 
     酒蔵・銘柄・商品名とそのメモをSQLiteに格納するPerlモジュール
@@ -70,6 +73,10 @@ Sake::DB - 来年も飲みたい日本酒データベース
 ## 商品に関連付けられたタグ: t_products_tags
 - product_id: 商品ID
 - tag_id: タグID
+
+# DEPENDENCE
+
+SQLite
 
 # LICENSE
 
