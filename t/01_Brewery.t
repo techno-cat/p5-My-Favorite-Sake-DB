@@ -1,11 +1,9 @@
 use strict;
 use Test::More 0.98;
 use lib './lib';
-use File::Temp qw/tempdir cleanup/;
+use File::Temp qw/tempdir/;
 
-use_ok $_ for qw(
-    Sake::DB
-);
+use Sake::DB;
 
 my $tmp_dir = tempdir ( DIR => '.', CLEANUP => 1 );
 my $db_file = "./${tmp_dir}/test.db";

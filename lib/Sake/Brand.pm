@@ -64,7 +64,7 @@ sub select_by {
 sub _fetch_all {
     my $sth = shift;
 
-    my @columns = qw/beand_id brewery_id name kana url/;
+    my @columns = qw/brand_id brewery_id name kana url/;
     my @ret = ();
     while (my $row = $sth->fetch()) {
         my $brewery = {};
