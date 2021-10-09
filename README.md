@@ -56,7 +56,7 @@ Sake::DB - 来年も飲みたい日本酒データベース
 - brewery_id: 酒蔵ID
 - name: 銘柄（ex. 猫のお酒）
 - kana: 銘柄（ex. ねこのおさけ）
-- url: URL（ex. http://neko-no-osake.jp/）
+- url: URL（ex. http://this-is-dummy.jp/）
 
 ## 商品: t_products
 - product_id: INTEGER PRIMARY KEY AUTOINCREMENT
