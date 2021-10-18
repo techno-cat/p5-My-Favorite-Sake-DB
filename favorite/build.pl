@@ -26,8 +26,11 @@ foreach my $file ( @files ) {
     say $file;
     my $fav = do $file;
 
-    my $brewery = $fav->{brewery};
-    my $brewery_id = Sake::Brewery::insert( $dbh, $brewery );
+    # 銘柄ごとにファイルを分けているので酒造が同じ場合がある
+    my $brewery_id = select_brewery_id( $dbh, $fav->{brewery} );
+    if ( not defined($brewery_id) ) {
+        $brewery_id = Sake::Brewery::insert( $dbh, $fav->{brewery} );
+    }
 
     my $brand = $fav->{brand};
     $brand->{brewery_id} = $brewery_id;
@@ -48,16 +51,49 @@ SQL
 my $sth = $dbh->prepare( $sql );
 $sth->execute() or die(DBI::errstr);
 
+my @fav_list = ();
 while (my $row = $sth->fetch()) {
     my ( $kura, $b_name, $b_kana, $sake_name ) = @{$row};
 
-    say "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=";
-    say $kura;
-    say "  ${b_name}（${b_kana}）";
-    say "  - ", $sake_name;
+    push @fav_list, +{
+        kura => $kura,
+        b_name => $b_name,
+        b_kana => $b_kana,
+        sake_name => $sake_name
+    };
 }
-say "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=";
 
 $dbh->disconnect;
 
+while ( @fav_list ) {
+
+    my $fav = $fav_list[0];
+    my @tmp = ();
+    my @new_fav_list = ();
+    foreach ( @fav_list ) {
+        if ( $fav->{kura} eq $_->{kura} and $fav->{b_name} eq $_->{b_name} ) {
+            push @tmp, $_;
+        }
+        else {
+            push @new_fav_list, $_;
+        }
+    }
+
+    @fav_list = @new_fav_list;
+
+    say "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=";
+    say $fav->{kura};
+    say "  " . $fav->{b_name} . "（" . $fav->{b_kana} . "）";
+    foreach ( @tmp ) {
+        say "  - ", $_->{sake_name};
+    }
+}
+say "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=";
 say 'done!';
+
+sub select_brewery_id {
+    my ( $dbh, $brewery ) = @_;
+
+    my $breweries = Sake::Brewery::select_by( $dbh, $brewery );
+    return @{$breweries} ? $breweries->[0]->{brewery_id} : undef;
+}
